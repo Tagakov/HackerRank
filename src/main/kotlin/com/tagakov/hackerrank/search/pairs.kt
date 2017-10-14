@@ -3,13 +3,15 @@ package com.tagakov.hackerrank.search
 import java.util.*
 
 fun main(args: Array<String>) {
-    val (k, list) = with(Scanner(System.`in`)) {
+    val (k, nums) = with(Scanner(System.`in`)) {
         val n = nextInt()
-        nextInt() to (1..n).map { nextInt() }.sorted()
+        nextInt() to (1..n)
+                .asSequence()
+                .map { nextInt() }
+                .toHashSet()
     }
 
-    //can be optimised by starting binary search from the current's element index
-    val pairsCount = list.count { list.binarySearch(it + k) > 0 }
+    val pairsCount = nums.count { nums.contains(it + k) }
 
     println(pairsCount)
 }
