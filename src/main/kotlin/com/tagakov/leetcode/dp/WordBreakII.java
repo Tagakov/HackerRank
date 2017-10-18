@@ -1,15 +1,14 @@
 package com.tagakov.leetcode.dp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class WordBreakII {
 
     private final StringBuilder sb = new StringBuilder();
+    private final Map<String, List<String>> cache = new HashMap<>();
 
     public static void main(String... args) {
-        System.out.println(new WordBreakII().wordBreak("abcd", Arrays.asList("a", "abc", "b", "cd")));
+        System.out.println(new WordBreakII().wordBreak("catsanddog", Arrays.asList("cat", "cats", "and", "sand", "dog")));
     }
 
     private List<String> wordBreak(String s, List<String> wordDict) {
@@ -17,7 +16,11 @@ public class WordBreakII {
         List<String> result = new ArrayList<>();
         for (String word : wordDict) {
             if (s.startsWith(word)) {
-                List<String> strings = wordBreak(s.substring(word.length()), wordDict);
+                String substring = s.substring(word.length());
+                if (!cache.containsKey(substring)) {
+                    cache.put(substring, wordBreak(substring, wordDict));
+                }
+                List<String> strings = cache.get(substring);
 
                 if (strings == null) {
                     result.add(word);
