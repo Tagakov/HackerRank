@@ -4,15 +4,6 @@ import java.util.*
 import kotlin.collections.HashMap
 
 private class LineRegistry(line: String) {
-    inner class CharEntry(val index: Int) : Comparable<CharEntry> {
-        val char: Char = reversedLine[index]
-        val isMinimal = !sortedChars.isEmpty() && sortedChars.first() == char
-        val isCritical = remainingInResult[char] == charsCounter[char]
-        val isNeeded = remainingInResult[char] != 0
-
-        override fun compareTo(other: CharEntry) = char.compareTo(other.char)
-    }
-
     private fun HashMap<Char, Int>.increment(c: Char) = ((get(c) ?: 0) + 1).also { put(c, it) }
     private fun HashMap<Char, Int>.decrement(c: Char) = ((get(c) ?: 0) - 1).also { put(c, it) }
 
@@ -20,10 +11,11 @@ private class LineRegistry(line: String) {
     private val charsCounter = line.fold(hashMapOf<Char, Int>()) { acc, c -> acc.apply { increment(c) } }
     private val sortedChars = line.toSortedSet()
     private val remainingInResult = HashMap(charsCounter).apply { replaceAll { _, counter -> counter / 2 } }
+    private val result = StringBuilder()
 
     private var index = 0
 
-    val result = StringBuilder()
+    fun result() = result.toString()
 
     fun hasNext() = index < reversedLine.length
 
@@ -42,6 +34,15 @@ private class LineRegistry(line: String) {
         }
         index = entry.index + 1
     }
+
+    inner class CharEntry(val index: Int) : Comparable<CharEntry> {
+        val char: Char = reversedLine[index]
+        val isMinimal = !sortedChars.isEmpty() && sortedChars.first() == char
+        val isCritical = remainingInResult[char] == charsCounter[char]
+        val isNeeded = remainingInResult[char] != 0
+
+        override fun compareTo(other: CharEntry) = char.compareTo(other.char)
+    }
 }
 
 fun main(args: Array<String>) {
@@ -51,10 +52,9 @@ fun main(args: Array<String>) {
 
     while (lineRegistry.hasNext()) {
         val letter = lineRegistry.next()
-        when {
-            !letter.isNeeded -> {
-            }
+        if (!letter.isNeeded) continue
 
+        when {
             letter.isMinimal -> {
                 lineRegistry.appendToResult(letter)
                 minimalSkippedEntry = null
@@ -74,5 +74,5 @@ fun main(args: Array<String>) {
             minimalSkippedEntry == null || minimalSkippedEntry > letter -> minimalSkippedEntry = letter
         }
     }
-    println(lineRegistry.result)
+    println(lineRegistry.result())
 }
